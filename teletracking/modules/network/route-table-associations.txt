@@ -1,0 +1,108 @@
+/*resource "aws_ec2_transit_gateway_route_table_association" "tgw-hub-attch-rt" {
+  transit_gateway_attachment_id  = module.tgw.ec2_transit_gateway_vpc_attachment_ids[0]
+  transit_gateway_route_table_id = module.tgw.ec2_transit_gateway_route_ids[0]
+}
+
+resource "aws_ec2_transit_gateway_route_table_association" "tgw-pod-attch-rt" {
+  transit_gateway_attachment_id  = module.tgw.ec2_transit_gateway_vpc_attachment_ids[1]
+  transit_gateway_route_table_id = module.tgw.ec2_transit_gateway_route_ids[1]
+}*/
+
+resource "aws_route_table_association" "tgwep1_rt_hub_sa" {
+  subnet_id      = local.tgw_subnets_ids[0]
+  route_table_id = aws_route_table.tgwep1_rt_hub.id
+}
+
+resource "aws_route_table_association" "tgwep2_rt_hub_sa" {
+  subnet_id      = local.tgw_subnets_ids[1]
+  route_table_id = aws_route_table.tgwep2_rt_hub.id
+}
+
+resource "aws_route_table_association" "tgwep3_rt_hub_sa" {
+  subnet_id      = local.tgw_subnets_ids[2]
+  route_table_id = aws_route_table.tgwep3_rt_hub.id
+}
+
+resource "aws_route_table_association" "prisb1_rt_hub_sa" {
+  subnet_id      = local.prv_subnets_ids[0]
+  route_table_id = aws_route_table.prisb1_rt_hub.id
+}
+
+resource "aws_route_table_association" "prisb2_rt_hub_sa" {
+  subnet_id      = local.prv_subnets_ids[1]
+  route_table_id = aws_route_table.prisb2_rt_hub.id
+}
+resource "aws_route_table_association" "prisb3_rt_hub_sa" {
+  subnet_id      = local.prv_subnets_ids[2]
+  route_table_id = aws_route_table.prisb3_rt_hub.id
+}
+
+resource "aws_route_table_association" "pod_rt_db_sa1" {
+  subnet_id      = local.db_subnets_ids[0]
+  route_table_id = aws_route_table.pod_rt_db.id
+}
+
+resource "aws_route_table_association" "pod_rt_db_sa2" {
+  subnet_id      = local.db_subnets_ids[1]
+  route_table_id = aws_route_table.pod_rt_db.id
+}
+
+resource "aws_route_table_association" "pod_rt_tgwep_sa1" {
+  subnet_id      = local.podtgw_subnets_ids[0]
+  route_table_id = aws_route_table.pod_rt_tgwep.id
+}
+
+resource "aws_route_table_association" "pod_rt_tgwep_sa2" {
+  subnet_id      = local.podtgw_subnets_ids[1]
+  route_table_id = aws_route_table.pod_rt_tgwep.id
+}
+
+resource "aws_route_table_association" "pod_rt_web_app_sa1" {
+  subnet_id      = local.network_interface_subnets_ids[0]
+  route_table_id = aws_route_table.pod_rt_web_app.id
+}
+
+resource "aws_route_table_association" "pod_rt_web_app_sa2" {
+  subnet_id      = local.network_interface_subnets_ids[1]
+  route_table_id = aws_route_table.pod_rt_web_app.id
+}
+
+resource "aws_route_table_association" "pod_rt_web_app_sa3" {
+  subnet_id      = local.app_subnets_ids[0]
+  route_table_id = aws_route_table.pod_rt_web_app.id
+}
+
+resource "aws_route_table_association" "pod_rt_web_app_sa4" {
+  subnet_id      = local.app_subnets_ids[1]
+  route_table_id = aws_route_table.pod_rt_web_app.id
+}
+
+resource "aws_route_table_association" "ingress1_sa" {
+  subnet_id      = local.ingress_subnets_ids[0]
+  route_table_id = aws_route_table.ingress1.id
+}
+
+resource "aws_route_table_association" "ingress2_sa" {
+  subnet_id      = local.ingress_subnets_ids[1]
+  route_table_id = aws_route_table.ingress2.id
+}
+
+resource "aws_route_table_association" "ingress3_sa" {
+  subnet_id      = local.ingress_subnets_ids[2]
+  route_table_id = aws_route_table.ingress3.id
+}
+
+resource "aws_route_table_association" "fwsb_rt_hub_sa1" {
+  subnet_id      = local.fw_subnets_ids[0]
+  route_table_id = aws_route_table.fwsb_rt_hub.id
+}
+
+resource "aws_route_table_association" "fwsb_rt_hub_sa2" {
+  subnet_id      = local.fw_subnets_ids[1]
+  route_table_id = aws_route_table.fwsb_rt_hub.id
+}
+
+resource "aws_route_table_association" "fwsb_rt_hub_sa3" {
+  subnet_id      = local.fw_subnets_ids[2]
+  route_table_id = aws_route_table.fwsb_rt_hub.id
+}
