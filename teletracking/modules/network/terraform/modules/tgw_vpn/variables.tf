@@ -10,26 +10,28 @@ variable "tags" {
   default     = {}
 }
 
-variable "vpn_connection_specs" {
+variable "vpn_cgw" {
   description = "Customer gateway basic information"
-  type = list(object({
-    customer_gateway = object({
+  type = object({
       bgp_asn         = number
       ip_address      = string
       type            = optional(string, "ipsec.1")
       name            = string
       dynamic_routing = bool
-    }),
-    connection      = object({
+    })
+  }
+
+variable "vpn_connection_specs" {
+ description = "Customer gateway basic information"
+  type = object({
       name                        = string
-      tunnel1_inside_cidr         = string
-      tunnel2_inside_cidr         = string
-      tunnel1_preshared_key       = string
-      tunnel2_preshared_key       = string
+      tunnel1_inside_cidr         = optional(string, "")
+      tunnel2_inside_cidr         = optional(string, "")
+      tunnel1_preshared_key       = optional(string, "")
+      tunnel2_preshared_key       = optional(string, "")
       static_routes_destinations  = optional(list(string), [])
-    }),
-    default_route_destination_attachment = string
-  }))
+      default_route_destination_attachment = string
+    })
 }
 
 variable "transit_gateway_hub_id" {

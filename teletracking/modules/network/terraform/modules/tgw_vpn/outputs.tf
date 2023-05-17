@@ -1,11 +1,9 @@
 output "customer_gateway_id" {
-  for_each    = aws_customer_gateway.cgw
   description = "ID of the Customer Gateway"
-  value       = element(concat(aws_customer_gateway.aws_customer_gateway.*.id, []), 0)
+  value       = element(concat(aws_customer_gateway.cgw.*.id, []), 0)
 }
 
 output "vpn_connection" {
-  for_each    = aws_vpn_connection.vpn_connection
   description = "VPN connection details"
   value = {
     id                            = element(concat(aws_vpn_connection.vpn_connection.*.id, []), 0)

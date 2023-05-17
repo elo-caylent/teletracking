@@ -4,25 +4,25 @@ resource "aws_security_group" "hub_alb_sg" {
   vpc_id      = module.vpc.vpc_id
 
   ingress {
-    description      = "allowing https traffic from the internet"
-    from_port        = 443
-    to_port          = 443
-    protocol         = "tcp"
-    cidr_blocks      = ["0.0.0.0/0"]
+    description = "allowing https traffic from the internet"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
   ingress {
-    description      = "allowing http traffic from the internet"
-    from_port        = 80
-    to_port          = 80
-    protocol         = "tcp"
-    cidr_blocks      = ["0.0.0.0/0"]
+    description = "allowing http traffic from the internet"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
   egress {
-    description      = "allowing http traffic from the internet"
-    from_port        = 0
-    to_port          = 0
-    protocol         = "tcp"
-    cidr_blocks      = ["0.0.0.0/0"]
+    description = "allowing http traffic from the internet"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
 }
@@ -33,39 +33,39 @@ resource "aws_security_group" "app_sg_pod" {
   vpc_id      = module.vpc_pod.vpc_id
 
   ingress {
-    description      = ""
-    from_port        = 443
-    to_port          = 443
-    protocol         = "tcp"
-    cidr_blocks      = values(var.web_subnet_cidr_per_az)
+    description = ""
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = values(var.web_subnet_cidr_per_az)
   }
   ingress {
-    description      = "HTTPS access from the HUB VPC"
-    from_port        = 443
-    to_port          = 443
-    protocol         = "tcp"
-    cidr_blocks      = [var.vpc_cidr]
+    description = "HTTPS access from the HUB VPC"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = [var.vpc_cidr]
   }
   ingress {
-    description      = "HTTPS access from the POD VPC"
-    from_port        = 443
-    to_port          = 443
-    protocol         = "tcp"
-    security_groups      = ["${aws_security_group.pod_alb_sg.id}"]
+    description     = "HTTPS access from the POD VPC"
+    from_port       = 443
+    to_port         = 443
+    protocol        = "tcp"
+    security_groups = ["${aws_security_group.pod_alb_sg.id}"]
   }
   ingress {
-    description      = "sip connections fron the internet"
-    from_port        = 5060
-    to_port          = 5060
-    protocol         = "tcp"
-    cidr_blocks      = ["0.0.0.0/0"]
+    description = "sip connections fron the internet"
+    from_port   = 5060
+    to_port     = 5060
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
   egress {
-    description      = ""
-    from_port        = 0
-    to_port          = 0
-    protocol         = "tcp"
-    cidr_blocks      = ["0.0.0.0/0"]
+    description = ""
+    from_port   = 0
+    to_port     = 0
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
 
@@ -77,11 +77,11 @@ resource "aws_security_group" "rds_ec2" {
   vpc_id      = module.vpc_pod.vpc_id
 
   ingress {
-    description      = "Rule to allow connections from EC2 instances with sg-017c700ba8ece6e90 attached"
-    from_port        = 1433
-    to_port          = 1433
-    protocol         = "tcp"
-    security_groups      = ["${aws_security_group.ec2_rds.id}"]
+    description     = "Rule to allow connections from EC2 instances with sg-017c700ba8ece6e90 attached"
+    from_port       = 1433
+    to_port         = 1433
+    protocol        = "tcp"
+    security_groups = ["${aws_security_group.ec2_rds.id}"]
   }
 
 }
@@ -92,11 +92,11 @@ resource "aws_security_group" "ec2_rds" {
   vpc_id      = module.vpc_pod.vpc_id
 
   egress {
-    description      = "Rule to allow connections to mse-poc from any instances this security group is attached to"
-    from_port        = 1433
-    to_port          = 1433
-    protocol         = "tcp"
-    cidr_blocks      = values(var.web_subnet_cidr_per_az)
+    description = "Rule to allow connections to mse-poc from any instances this security group is attached to"
+    from_port   = 1433
+    to_port     = 1433
+    protocol    = "tcp"
+    cidr_blocks = values(var.web_subnet_cidr_per_az)
   }
 
 }
@@ -107,39 +107,39 @@ resource "aws_security_group" "db_sg_pod" {
   vpc_id      = module.vpc_pod.vpc_id
 
   ingress {
-    description      = "allowing traffic from private jumpbox"
-    from_port        = 1443
-    to_port          = 1443
-    protocol         = "tcp"
-    cidr_blocks      = ["10.1.128.132/32"]
+    description = "allowing traffic from private jumpbox"
+    from_port   = 1443
+    to_port     = 1443
+    protocol    = "tcp"
+    cidr_blocks = ["10.1.128.132/32"]
   }
   ingress {
-    description      = "allowing traffic from private jumpbox"
-    from_port        = 1443
-    to_port          = 1443
-    protocol         = "tcp"
-    security_groups      = ["${aws_security_group.app_sg_pod.id}"]
+    description     = "allowing traffic from private jumpbox"
+    from_port       = 1443
+    to_port         = 1443
+    protocol        = "tcp"
+    security_groups = ["${aws_security_group.app_sg_pod.id}"]
   }
   ingress {
-    description      = "allowing traffic from Jumpbox to RDS instance"
-    from_port        = 1443
-    to_port          = 1443
-    protocol         = "tcp"
-    cidr_blocks      = ["10.1.129.90/32"]
+    description = "allowing traffic from Jumpbox to RDS instance"
+    from_port   = 1443
+    to_port     = 1443
+    protocol    = "tcp"
+    cidr_blocks = ["10.1.129.90/32"]
   }
   ingress {
-    description      = "allowing traffic from private jumpbox"
-    from_port        = 1443
-    to_port          = 1443
-    protocol         = "tcp"
-    security_groups      = ["${aws_security_group.web_sg_pod.id}"]
+    description     = "allowing traffic from private jumpbox"
+    from_port       = 1443
+    to_port         = 1443
+    protocol        = "tcp"
+    security_groups = ["${aws_security_group.web_sg_pod.id}"]
   }
   egress {
-    description      = "allowing traffic from web tier to RDS instance"
-    from_port        = 0
-    to_port          = 0
-    protocol         = "tcp"
-    cidr_blocks      = ["0.0.0.0/0"]
+    description = "allowing traffic from web tier to RDS instance"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
 }
@@ -150,33 +150,33 @@ resource "aws_security_group" "web_sg_pod" {
   vpc_id      = module.vpc_pod.vpc_id
 
   ingress {
-    description      = "allow https from app tier sg"
-    from_port        = 443
-    to_port          = 443
-    protocol         = "tcp"
-    security_groups      = ["${aws_security_group.app_sg_pod.id}"]
+    description     = "allow https from app tier sg"
+    from_port       = 443
+    to_port         = 443
+    protocol        = "tcp"
+    security_groups = ["${aws_security_group.app_sg_pod.id}"]
   }
   ingress {
-    description      = "allow https from web tier sg"
-    from_port        = 443
-    to_port          = 443
-    protocol         = "tcp"
-    cidr_blocks      = values(var.web_subnet_cidr_per_az)
+    description = "allow https from web tier sg"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = values(var.web_subnet_cidr_per_az)
   }
 
   ingress {
-    description      = "allow https from pod alb sg"
-    from_port        = 443
-    to_port          = 443
-    protocol         = "tcp"
-    security_groups      = ["${aws_security_group.pod_alb_sg.id}"]
+    description     = "allow https from pod alb sg"
+    from_port       = 443
+    to_port         = 443
+    protocol        = "tcp"
+    security_groups = ["${aws_security_group.pod_alb_sg.id}"]
   }
   egress {
-    description      = ""
-    from_port        = 0
-    to_port          = 0
-    protocol         = "tcp"
-    cidr_blocks      = ["0.0.0.0/0"]
+    description = ""
+    from_port   = 0
+    to_port     = 0
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
 }
@@ -187,18 +187,18 @@ resource "aws_security_group" "pod_ssmep_sg" {
   vpc_id      = module.vpc_pod.vpc_id
 
   ingress {
-    description      = "HTTPS access to SSM from POD VPC VMs"
-    from_port        = 443
-    to_port          = 443
-    protocol         = "tcp"
-    cidr_blocks      = [var.vpc_cidr_pod]
+    description = "HTTPS access to SSM from POD VPC VMs"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = [var.vpc_cidr_pod]
   }
   egress {
-    description      = ""
-    from_port        = 0
-    to_port          = 0
-    protocol         = "tcp"
-    cidr_blocks      = ["0.0.0.0/0"]
+    description = ""
+    from_port   = 0
+    to_port     = 0
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
 }
@@ -209,25 +209,25 @@ resource "aws_security_group" "pod_alb_sg" {
   vpc_id      = module.vpc_pod.vpc_id
 
   ingress {
-    description      = "HTTPS access from the POD VPC"
-    from_port        = 443
-    to_port          = 443
-    protocol         = "tcp"
-    cidr_blocks      = [var.vpc_cidr_pod]
+    description = "HTTPS access from the POD VPC"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = [var.vpc_cidr_pod]
   }
   ingress {
-    description      = "HTTPS access from the HUB VPC"
-    from_port        = 443
-    to_port          = 443
-    protocol         = "tcp"
-    cidr_blocks      = [var.vpc_cidr]
+    description = "HTTPS access from the HUB VPC"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = [var.vpc_cidr]
   }
   egress {
-    description      = ""
-    from_port        = 0
-    to_port          = 0
-    protocol         = "tcp"
-    cidr_blocks      = ["0.0.0.0/0"]
+    description = ""
+    from_port   = 0
+    to_port     = 0
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
 }

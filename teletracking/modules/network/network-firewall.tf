@@ -1,6 +1,5 @@
 module "network_firewall" {
-    source  = "mattyait/network-firewall/aws"
-    version = "0.1.2"
+    source  = "./terraform/modules/network_firewall"
     firewall_name = "fw-hub"
     vpc_id        = module.vpc.vpc_id
     prefix        = "Hub"

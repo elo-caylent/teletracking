@@ -1,3 +1,4 @@
+/*
 resource "aws_customer_gateway" "this" {
   bgp_asn    = var.cgw_bgp_asn
   ip_address = var.cgw_ip_address
@@ -33,3 +34,4 @@ resource "aws_ec2_transit_gateway_route" "this" {
   transit_gateway_attachment_id  = aws_vpn_connection.this.transit_gateway_attachment_id
   transit_gateway_route_table_id = data.aws_ec2_transit_gateway_route_table.this.id
 }
+*/
