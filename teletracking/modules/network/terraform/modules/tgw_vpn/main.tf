@@ -1,3 +1,8 @@
+locals {
+  custome_routes_count = length(var.tgw_vpn_custome_routes) != null ? length(var.tgw_vpn_custome_routes) : 0
+  propagated_routes_count = length(var.tgw_vpn_propagated_routes.origin_attachments) != null ? length(var.tgw_vpn_propagated_routes.origin_attachments) : 0
+}
+
 resource "aws_customer_gateway" "cgw" {
   bgp_asn    = var.vpn_cgw.bgp_asn
   ip_address = var.vpn_cgw.ip_address
@@ -33,29 +38,24 @@ resource "aws_ec2_transit_gateway_route_table" "vpn_att_rt" {
   )
 }
 
-resource "aws_ec2_transit_gateway_route" "default_vpn_att_route" {
+resource "aws_ec2_transit_gateway_route" "custome_route" {
+  count = local.custome_routes_count
 
-  destination_cidr_block = "0.0.0.0/0"
+  destination_cidr_block = var.tgw_vpn_custome_routes[count.index].destination_cidr_block
+  blackhole              = var.tgw_vpn_custome_routes[count.index].blackhole
 
   transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.vpn_att_rt.id
-  transit_gateway_attachment_id  = var.vpn_connection_specs.default_route_destination_attachment
+  transit_gateway_attachment_id  = var.tgw_vpn_custome_routes[count.index].blackhole == false ? var.tgw_vpn_custome_routes[count.index].destination_attachment : null
+}
+
+resource "aws_ec2_transit_gateway_route_table_propagation" "this" {
+  count = local.propagated_routes_count
+
+  transit_gateway_attachment_id  = var.tgw_vpn_propagated_routes.origin_attachments[count.index]
+  transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.vpn_att_rt.id
 }
 
 resource "aws_ec2_transit_gateway_route_table_association" "vpn_att_rt_association" {
   transit_gateway_attachment_id  = aws_vpn_connection.vpn_connection.transit_gateway_attachment_id
   transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.vpn_att_rt.id
 }
-
-/*
-resource "aws_ec2_transit_gateway_route_table_propagation" "this" {
-  transit_gateway_attachment_id  = aws_vpn_connection.this.transit_gateway_attachment_id
-  transit_gateway_route_table_id = data.aws_ec2_transit_gateway_route_table.this.id
-}
-
-resource "aws_ec2_transit_gateway_route" "this" {
-  count                          = var.static_routes_only ? length(var.static_routes_destinations) : 0
-  destination_cidr_block         = element(var.static_routes_destinations, count.index)
-  transit_gateway_attachment_id  = aws_vpn_connection.this.transit_gateway_attachment_id
-  transit_gateway_route_table_id = data.aws_ec2_transit_gateway_route_table.this.id
-}
-*/

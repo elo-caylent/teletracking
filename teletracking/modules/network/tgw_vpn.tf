@@ -1,29 +1,17 @@
-# The Transit Gateway (hub) has already been created in AWS, as a fixture for
-# this test case due to not being able to use 'depends_on' on Terraform modules
+# The Transit Gateway (hub) has already been created in AWS, or it is being created during this same deployment
+
 module "bgp_vpn" {
   source = "./terraform/modules/tgw_vpn"
 
+  vpn_cgw = local.bgp_vpn_cgw
 
-    vpn_cgw = {
-      bgp_asn         = 64802
-      ip_address      = "20.7.6.158"
-      type            = "ipsec.1"
-      name            = "telemsetest-bgp-vpn-cgw-poc"
-      dynamic_routing = true
-    }
+  vpn_connection_specs = local.bgp_vpn_connection_specs
 
-    vpn_connection_specs =  {
-      name                        = "telemsetest-bgp-vpn-poc"
-      tunnel1_inside_cidr         = "169.254.252.0/30"
-      tunnel2_inside_cidr         = "169.254.252.4/30"
-      tunnel1_preshared_key       = "mnBTnk.GlPAjikkxuACuI.9ZqqQIxuWB"
-      tunnel2_preshared_key       = "mnBTnk.GlPAjikkxuACuI.9ZqqQIxuWB"
-      #static_routes_destinations  = optional(list(string), [])
-      default_route_destination_attachment = module.tgw.ec2_transit_gateway_vpc_attachment_ids[0]
-    }
+  tgw_vpn_custome_routes = local.bgp_tgw_vpn_custome_routes
 
-  transit_gateway_hub_id = module.tgw.ec2_transit_gateway_id
-  #transit_gateway_hub_name   = var.transit_gateway_hub_name
+  tgw_vpn_propagated_routes = local.bgp_tgw_vpn_propagated_routes
+
+  transit_gateway_hub_id = local.transit_gateway_hub_id
 
   #tags = local.tags
 }
@@ -31,25 +19,15 @@ module "bgp_vpn" {
 module "static_vpn" {
   source = "./terraform/modules/tgw_vpn"
 
+  vpn_cgw = local.static_vpn_cgw
 
-    vpn_cgw = {
-      bgp_asn         = 64577
-      ip_address      = "20.7.6.194"
-      #type            = "ipsec.1"
-      name            = "telemsetest-vpn-cgw-poc"
-      dynamic_routing = false
-    }
+  vpn_connection_specs   = local.static_vpn_connection_specs
 
-    vpn_connection_specs =  {
-      name                        = "telemsetest-vpn-poc"
-      #tunnel1_inside_cidr   = "169.254.253.0/30"
-      #tunnel2_inside_cidr   = "169.254.253.4/30"
-      #static_routes_destinations  = optional(list(string), [])
-      default_route_destination_attachment = module.tgw.ec2_transit_gateway_vpc_attachment_ids[0]
-    }
+  tgw_vpn_custome_routes = local.static_tgw_vpn_custome_routes
 
-  transit_gateway_hub_id = module.tgw.ec2_transit_gateway_id
-  #transit_gateway_hub_name   = var.transit_gateway_hub_name
+  tgw_vpn_propagated_routes = local.static_tgw_vpn_propagated_routes
+
+  transit_gateway_hub_id = local.transit_gateway_hub_id
 
   #tags = local.tags
 }

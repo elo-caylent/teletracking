@@ -134,12 +134,12 @@ module "endpoints_hub" {
 
 module "tgw" {
   source = "./terraform/modules/tgw"
-  #version = "~> 2.0"
 
   name        = "tgw-mse-poc"
   description = "My TGW shared with several other AWS accounts"
 
-  enable_auto_accept_shared_attachments = true
+  enable_auto_accept_shared_attachments  = true
+  enable_default_route_table_association = false
 
   vpc_attachments = {
     tgw_att_to_hub = {

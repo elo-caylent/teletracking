@@ -1,3 +1,4 @@
+/*
 resource "aws_flow_log" "hub-flow-logs" {
   log_destination      = aws_s3_bucket.hub-fl-bucket.arn
   log_destination_type = "s3"
@@ -19,3 +20,4 @@ resource "aws_s3_bucket" "hub-fl-bucket" {
 resource "aws_s3_bucket" "pod-fl-bucket" {
   bucket = "pod-fl-bucket"
 }
+*/
