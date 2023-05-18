@@ -1,4 +1,3 @@
-/*
 module "network_firewall" {
     source  = "./terraform/modules/network_firewall"
     firewall_name = "fw-hub"
@@ -8,133 +7,118 @@ module "network_firewall" {
     #Passing Individual Subnet ID to have required endpoint
     subnet_mapping = local.fw_subnets_ids
 
-    fw1-stateful-rg = [
+    fivetuple_stateful_rule_group = [
         {
         capacity    = 100
-        name        = "stateful"
-        description = "Stateful rule example1 with 5 tuple option"
-        rule_config = [{
+        name        = "stateful_rule_set"
+        description = "5 tuple Stateful rule set for MSE PoC"
+        
+        rule_variables = {
+            port_sets = [
+                {
+                    key = "SIP_PORTS"
+                    port_sets = ["5060", "49100", "49101","49102","49103","49104","49105","49106","49107","49108","49109","49110","49111","49112","49113","49114","49115","49116","49117","49118","49119","49120","49121","49122","49123","49124","49125","49126","49127","49128","49129"]
+                },
+                {
+                    key = "WEB_PORTS"
+                    port_sets = ["443","80"]
+                }
+            ]
+        }
+
+        rule_config = [
+        {
             description           = "Pass All Rule"
-            protocol              = "HTTP"
-            source_ipaddress      = "any"
-            source_port           = "any"
+            protocol              = "TCP"
+            source_ipaddress      = "0.0.0.0/0"
+            source_port           = "ANY"
             destination_ipaddress = "10.1.129.0/24"
-            destination_port      = [443,80]
+            destination_port      = "$SIP_PORTS"
             direction             = "Forward"
             sid                   = 1
             actions = {
-            type = "pass"
+            type = "PASS"
             }
-        }]
         },
         {
-        capacity    = 100
-        name        = "stateful"
-        description = "Stateful rule example1 with 5 tuple option"
-        rule_config = [{
             description           = "Pass All Rule"
             protocol              = "HTTP"
             source_ipaddress      = "10.1.160.0/21"
-            source_port           = "any"
-            destination_ipaddress = "any"
-            destination_port      = [443,80]
+            source_port           = "ANY"
+            destination_ipaddress = "0.0.0.0/0"
+            destination_port      = "$WEB_PORTS"
             direction             = "Forward"
-            sid                   = 1
+            sid                   = 2
             actions = {
-            type = "pass"
+            type = "PASS"
             }
-        }]
         },
         {
-        capacity    = 100
-        name        = "stateful"
-        description = "Stateful rule example1 with 5 tuple option"
-        rule_config = [{
             description           = "Pass All Rule"
-            protocol              = "HTTP"
+            protocol              = "TCP"
             source_ipaddress      = "10.1.160.128/26"
-            source_port           = "any"
-            destination_ipaddress = "any"
-            destination_port      = 5671
+            source_port           = "ANY"
+            destination_ipaddress = "0.0.0.0/0"
+            destination_port      = "5671"
             direction             = "Forward"
-            sid                   = 1
+            sid                   = 3
             actions = {
-            type = "pass"
+            type = "PASS"
             }
-        }]
         },
         {
-        capacity    = 100
-        name        = "stateful"
-        description = "Stateful rule example1 with 5 tuple option"
-        rule_config = [{
             description           = "Pass All Rule"
             protocol              = "TCP"
-            source_ipaddress      = "any"
-            source_port           = "any"
+            source_ipaddress      = "0.0.0.0/0"
+            source_port           = "ANY"
             destination_ipaddress = "10.1.129.0/24"
-            destination_port      = [5671, 49100 - 49129]
+            destination_port      = "5671"
             direction             = "Forward"
-            sid                   = 1
+            sid                   = 4
             actions = {
-            type = "pass"
+            type = "PASS"
             }
-        }]
         },
         {
-        capacity    = 100
-        name        = "stateful"
-        description = "Stateful rule example1 with 5 tuple option"
-        rule_config = [{
             description           = "Pass All Rule"
             protocol              = "UDP"
-            source_ipaddress      = "any"
-            source_port           = "any"
+            source_ipaddress      = "0.0.0.0/0"
+            source_port           = "ANY"
             destination_ipaddress = "10.1.129.0/24"
-            destination_port      = [5671, 49100 - 49129]
+            destination_port      = "5671"
             direction             = "Forward"
-            sid                   = 1
+            sid                   = 5
             actions = {
-            type = "pass"
+            type = "PASS"
             }
-        }]
         },
         {
-        capacity    = 100
-        name        = "stateful"
-        description = "Stateful rule example1 with 5 tuple option"
-        rule_config = [{
             description           = "Pass All Rule"
             protocol              = "TCP"
-            source_ipaddress      = ["10.1.160.0/21", "10.1.128.0/20"]
-            source_port           = "any"
-            destination_ipaddress = "any"
-            destination_port      = [5671, 49100 - 49129]
+            source_ipaddress      = "10.1.160.0/21" #, "10.1.128.0/20"
+            source_port           = "ANY"
+            destination_ipaddress = "0.0.0.0/0"
+            destination_port      = "5671"
             direction             = "Forward"
-            sid                   = 1
+            sid                   = 6
             actions = {
-            type = "pass"
+            type = "PASS"
             }
-        }]
         },
         {
-        capacity    = 100
-        name        = "stateful"
-        description = "Stateful rule example1 with 5 tuple option"
-        rule_config = [{
             description           = "Pass All Rule"
             protocol              = "UDP"
-            source_ipaddress      = ["10.1.160.0/21", "10.1.128.0/20"]
-            source_port           = "any"
-            destination_ipaddress = "any"
-            destination_port      = [5671, 49100 - 49129]
+            source_ipaddress      = "10.1.160.0/21" #, "10.1.128.0/20"
+            source_port           = "ANY"
+            destination_ipaddress = "0.0.0.0/0"
+            destination_port      = "5671"
             direction             = "Forward"
-            sid                   = 1
+            sid                   = 7
             actions = {
-            type = "pass"
+            type = "PASS"
             }
         }]
-        },
+        },    
     ]
 
     # Stateless Rule Group
@@ -143,25 +127,26 @@ module "network_firewall" {
         capacity    = 100
         name        = "stateless"
         description = "Stateless rule example1"
-        rule_config = [{
+        rule_config = [
+            {
             priority              = 1
             protocols_number      = [1]
-            source_ipaddress      = "any"
-            source_from_port      = "any"
-            source_to_port        = "any"
-            destination_ipaddress = "any"
-            destination_from_port = "any"
-            destination_to_port   = "any"
+            source_ipaddress      = "0.0.0.0/0"
+            source_from_port      = "ANY"
+            source_to_port        = "ANY"
+            destination_ipaddress = "0.0.0.0/0"
+            destination_from_port = "ANY"
+            destination_to_port   = "ANY"
             tcp_flag = {
             flags = ["SYN"]
             masks = ["SYN", "ACK"]
             }
             actions = {
-            type = "drop"
+            type = "DROP"
             }
-        }]
+            },
+        ]
         }]
 
     tags = local.tags
 }
-*/
