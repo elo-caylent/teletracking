@@ -10,10 +10,16 @@ module "network_firewall" {
     fivetuple_stateful_rule_group = [
         {
         capacity    = 100
-        name        = "stateful_rule_set"
+        name        = "stateful-rule-set"
         description = "5 tuple Stateful rule set for MSE PoC"
         
         rule_variables = {
+            ip_sets = [
+                {
+                    key = "HOME_NET"
+                    ip_set = ["10.1.160.0/21", "10.1.128.0/20"]
+                }
+            ]
             port_sets = [
                 {
                     key = "SIP_PORTS"
@@ -43,7 +49,7 @@ module "network_firewall" {
         {
             description           = "Pass All Rule"
             protocol              = "HTTP"
-            source_ipaddress      = "10.1.160.0/21"
+            source_ipaddress      = "$HOME_NET"
             source_port           = "ANY"
             destination_ipaddress = "0.0.0.0/0"
             destination_port      = "$WEB_PORTS"
