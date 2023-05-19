@@ -21,7 +21,7 @@ module "static_vpn" {
 
   vpn_cgw = local.static_vpn_cgw
 
-  vpn_connection_specs   = local.static_vpn_connection_specs
+  vpn_connection_specs = local.static_vpn_connection_specs
 
   tgw_vpn_custome_routes = local.static_tgw_vpn_custome_routes
 

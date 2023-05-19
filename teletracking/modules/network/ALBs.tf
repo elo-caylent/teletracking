@@ -1,27 +1,28 @@
 module "hub-alb" {
-  source  = "terraform-aws-modules/alb/aws"
-  version = "~> 8.0"
+  source = "./terraform/modules/alb"
 
   name = "hub-alb-mse-poc"
-  
+
   load_balancer_type = "application"
-  
-  create_security_group = true
-  security_group_name = "hub-alb-sg"
+
+  create_security_group      = true
+  security_group_name        = "hub-alb-sg"
   security_group_description = "Security group for the application load balancer in the HUB"
   security_group_rules = {
-    {
-    description = "allowing traffic from private jumpbox"
-    from_port   = 1443
-    to_port     = 1443
-    protocol    = "tcp"
-    cidr_blocks = ["10.1.128.132/32"]
+    allow_all_http_ingress = {
+      type        = "egress"
+      description = "allowing traffic to http"
+      from_port   = "ANY"
+      to_port     = 80
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
     }
   }
+  #security_group_tags = local.tags
 
-  vpc_id             = "vpc-abcde012"
-  subnets            = ["subnet-abcde012", "subnet-bcde012a"]
-  
+  vpc_id  = module.vpc.vpc_id
+  subnets = local.prv_subnets_ids
+
   access_logs = {
     bucket = "my-alb-logs"
   }
@@ -35,11 +36,11 @@ module "hub-alb" {
       targets = {
         my_target = {
           target_id = "i-0123456789abcdefg"
-          port = 80
+          port      = 80
         }
         my_other_target = {
           target_id = "i-a1b2c3d4e5f6g7h8i"
-          port = 8080
+          port      = 8080
         }
       }
     }
