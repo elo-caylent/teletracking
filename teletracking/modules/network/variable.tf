@@ -188,3 +188,9 @@ variable "transit_gateway_hub_id" {
   type        = string
 }
 */
+
+#EC2#
+/*variable "iam_instance_profile" {
+  description = "Name of the IAM instance profile"
+  type        = string
+}*/
