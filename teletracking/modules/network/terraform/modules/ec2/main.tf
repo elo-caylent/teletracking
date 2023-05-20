@@ -9,6 +9,9 @@ resource "aws_instance" "ec2_instances" {
   subnet_id     = each.value.subnet_id
   security_groups = each.value.security_groups
 
+  # Conditional expression to include placement group if provided
+  placement_group = each.value.placement_group != null ? each.value.placement_group : null
+
   # Add any additional configuration as needed
 
   ebs_block_device {

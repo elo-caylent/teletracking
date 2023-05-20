@@ -190,7 +190,31 @@ variable "transit_gateway_hub_id" {
 */
 
 #EC2#
-/*variable "iam_instance_profile" {
-  description = "Name of the IAM instance profile"
+variable "ami_id" {
+  description = "default ami for cms ec2 resources "
   type        = string
-}*/
+  default     = "ami-0b7dd7b9e977b2b85"
+}
+
+variable "instance_type" {
+  description = "default instance type for ec2 resources "
+  type        = string
+  default     = "t3a.xlarge"
+}
+variable "volume_sizes" {
+  description = "default volume size for ec2 resources "
+  type        = string
+  default     = "256"
+}
+
+variable "volume_types" {
+  description = "default volume type for ec2 resources "
+  type        = string
+  default     = "gp3"
+}
+
+variable "iops" {
+  description = "default iops type for ec2 resources "
+  type        = string
+  default     = "3000"
+}

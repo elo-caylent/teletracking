@@ -7,6 +7,7 @@ variable "instances" {
     volume_size    = number
     volume_type    = string
     iops           = number
+    placement_group   = optional(string)
     security_groups = list(string)
   }))
   default     = []
