@@ -32,7 +32,7 @@ module "ec2_instances" {
     {
       name              = "CMS-Web-2"
       instance_type     = var.instance_type
-      subnet_id         = local.network_interface_subnets_ids[0]
+      subnet_id         = local.network_interface_subnets_ids[1]
       security_groups   = [aws_security_group.web_sg_pod.id]
       volume_size       = var.volume_sizes
       volume_type       = var.volume_types
@@ -44,7 +44,7 @@ module "ec2_instances" {
     {
       name              = "CMS-Test-Web"
       instance_type     = var.instance_type
-      subnet_id         = local.network_interface_subnets_ids[0]
+      subnet_id         = local.network_interface_subnets_ids[1]
       security_groups   = [aws_security_group.web_sg_pod.id]
       volume_size       = var.volume_sizes
       volume_type       = var.volume_types
@@ -54,8 +54,8 @@ module "ec2_instances" {
     {
       name              = "CMS-App-Server"
       instance_type     = var.instance_type
-      subnet_id         = local.network_interface_subnets_ids[0]
-      security_groups   = [aws_security_group.web_sg_pod.id]
+      subnet_id         = local.app_subnets_ids[0]
+      security_groups   = [aws_security_group.app_sg_pod.id]
       volume_size       = var.volume_sizes
       volume_type       = var.volume_types
       iops              = var.iops
@@ -64,8 +64,8 @@ module "ec2_instances" {
     {
       name              = "Test-CMS-App-Server"
       instance_type     = var.instance_type
-      subnet_id         = local.network_interface_subnets_ids[0]
-      security_groups   = [aws_security_group.web_sg_pod.id]
+      subnet_id         = local.app_subnets_ids[1]
+      security_groups   = [aws_security_group.app_sg_pod.id]
       volume_size       = var.volume_sizes
       volume_type       = var.volume_types
       iops              = var.iops

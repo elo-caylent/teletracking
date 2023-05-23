@@ -181,7 +181,7 @@ module "managed-ad" {
   source  = "./terraform/modules/managed-ad"
 
   ds_managed_ad_directory_name = "dev.us1.ttiq.io"
-  ds_managed_ad_short_name     = "hub-ds"
+  ds_managed_ad_password     = "MyStrongPassword123!"
   ds_managed_ad_edition        = "Standard"
   ds_managed_ad_vpc_id         = module.vpc.vpc_id
   ds_managed_ad_subnet_ids     = [local.prv_subnets_ids[0], local.prv_subnets_ids[2]]
