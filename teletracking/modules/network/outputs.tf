@@ -9,3 +9,8 @@ output "iam_instance_profile_name" {
   value       = module.ec2_instances.iam_instance_profile_name
 }
 */
+
+output "private_ip" {
+  description = "Private IP addresses of the EC2 instances"
+  value       = module.ec2_instances.private_ip
+}
