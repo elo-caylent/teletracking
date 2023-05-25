@@ -1,3 +1,4 @@
+/*
 module "network_firewall" {
   source        = "./terraform/modules/network_firewall"
   firewall_name = "fw-hub"
@@ -155,4 +156,4 @@ module "network_firewall" {
   }]
 
   tags = local.tags
-}
+}*/

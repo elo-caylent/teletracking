@@ -148,6 +148,12 @@ variable "subnets" {
   default     = null
 }
 
+variable "use_new_eips" {
+  description = "Defines weather or not to use new fixed public IPv4 IP addresses for the NLB listeners"
+  type        = bool
+  default     = false
+}
+
 variable "subnet_mapping" {
   description = "A list of subnet mapping blocks describing subnets to attach to network load balancer"
   type        = list(map(string))

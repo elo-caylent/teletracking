@@ -1,4 +1,4 @@
-locals {
+/*locals {
 
   transit_gateway_hub_id = module.tgw.ec2_transit_gateway_id
 
@@ -62,4 +62,5 @@ locals {
   static_tgw_vpn_propagated_routes = {
     origin_attachments = [module.tgw.ec2_transit_gateway_vpc_attachment_ids[0], module.tgw.ec2_transit_gateway_vpc_attachment_ids[1]]
   }
-}
+
+}*/

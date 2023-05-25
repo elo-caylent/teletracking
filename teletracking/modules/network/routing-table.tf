@@ -1,3 +1,4 @@
+/*
 resource "aws_route_table" "tgwep1_rt_hub" {
   vpc_id = module.vpc.vpc_id
 
@@ -149,3 +150,4 @@ resource "aws_route_table" "fwsb_rt_hub" {
   }
 
 }
+*/

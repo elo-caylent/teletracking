@@ -18,10 +18,10 @@ locals {
 
 }
 
-module "vpc" {
+module "vpc_hub" {
   source = "./terraform/modules/vpc"
 
-  name = "hub"
+  name = "hub-jesus"
   cidr = var.vpc_cidr
 
   azs                    = var.az
@@ -31,7 +31,7 @@ module "vpc" {
   enable_nat_gateway     = true
   single_nat_gateway     = false
   one_nat_gateway_per_az = true
-  enable_vpn_gateway     = true
+  enable_vpn_gateway     = false
 
   #tags = local.tags
 
@@ -42,7 +42,7 @@ module "vpc" {
 module "vpc_pod" {
   source = "./terraform/modules/vpc_pod"
 
-  name = "pod"
+  name = "pod-jesus"
   cidr = var.vpc_cidr_pod
 
   azs             = var.az_pod
@@ -59,9 +59,10 @@ locals {
   prv_subnets_ids               = [for subnet in module.vpc.private_subnets : subnet.id if contains(values(var.prv_subnet_cidr_per_az), subnet.cidr_block) == true]
   app_subnets_ids               = [for subnet in module.vpc_pod.private_subnets : subnet.id if contains(values(var.app_subnet_cidr_per_az), subnet.cidr_block) == true]
   db_subnets_ids                = [for subnet in module.vpc_pod.private_subnets : subnet.id if contains(values(var.db_subnet_cidr_per_az), subnet.cidr_block) == true]
+  pod_web_subnets_ids           = [for subnet in module.vpc_pod.private_subnets : subnet.id if contains(values(var.web_subnet_cidr_per_az), subnet.cidr_block) == true]
 }
 
-
+/*
 module "endpoints" {
   source = "./terraform/modules/vpc/modules/vpc-endpoints"
 
@@ -186,3 +187,4 @@ module "managed-ad" {
   ds_managed_ad_vpc_id         = module.vpc.vpc_id
   ds_managed_ad_subnet_ids     = [local.prv_subnets_ids[0], local.prv_subnets_ids[2]]
 }
+*/

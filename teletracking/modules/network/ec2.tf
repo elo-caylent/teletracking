@@ -9,7 +9,7 @@ module "ec2_instances" {
   instances = [
     {
       name              = "IQ-Connector"
-      instance_type     = "m6a.xlarge"
+      instance_type     = var.instance_type
       subnet_id         = local.network_interface_subnets_ids[0]
       security_groups   = [aws_security_group.web_sg_pod.id]
       volume_size       = var.volume_sizes

@@ -1,5 +1,5 @@
 # The Transit Gateway (hub) has already been created in AWS, or it is being created during this same deployment
-
+/*
 module "bgp_vpn" {
   source = "./terraform/modules/tgw_vpn"
 
@@ -30,4 +30,4 @@ module "static_vpn" {
   transit_gateway_hub_id = local.transit_gateway_hub_id
 
   #tags = local.tags
-}
+}*/

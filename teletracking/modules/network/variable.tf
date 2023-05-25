@@ -199,7 +199,7 @@ variable "ami_id" {
 variable "instance_type" {
   description = "default instance type for ec2 resources "
   type        = string
-  default     = "t3a.xlarge"
+  default     = "t2.micro"
 }
 variable "volume_sizes" {
   description = "default volume size for ec2 resources "
@@ -217,4 +217,62 @@ variable "iops" {
   description = "default iops type for ec2 resources "
   type        = string
   default     = "3000"
+}
+
+################################################################################
+#  Elastic Load Balancers
+################################################################################
+
+variable "use_new_eips" {
+  description = "Defines weather or not to use new fixed public IPv4 IP addresses for the NLB listeners"
+  type        = bool
+  default     = false
+}
+
+variable "load_balancer_type" {
+  description = "Defines weather the load balancer is application or Network type"
+  type        = string
+  default     = "network"
+}
+
+variable "sip_ports" {
+  description = "Ports used for the SIP connection to IVR"
+  type = list(number)
+  default = [ 5060, 49100, 49101, 49102, 49103, 49104, 49105, 49106, 49107, 49108, 49109, 49110, 49111, 49112, 49113, 49114, 49115, 49116, 49117, 49118, 49119, 49120, 49121, 49122, 49123, 49124, 49125, 49126, 49127, 49128, 49129 ]
+}
+
+variable "web_ingress_nlb_listener_certificate_arn" {
+  description = "The ARN of the ACM certificate used for the TLS listener of the web ingress NLB for HTTPS connection"
+  type        = string
+  default     = "" #Example: "arn:aws:iam::123456789012:server-certificate/test_cert-123456789012"
+}
+
+variable "ip_address_position" {
+  description = "Defines the IP Address position within a CIDR to use i.e: CIDR = 192.168.1.128/25, ip_address_position = 13; IP address result = 192.168.1.141"
+  type        = number
+  default     = 6
+}
+
+variable "prod_rtls_listener_certificate_arn" {
+  description = "The ARN of the ACM certificate used for the TLS listener of the PROD app server NLB for RTLS connection"
+  type        = string
+  default     = "" #Example: "arn:aws:iam::123456789012:server-certificate/test_cert-123456789012"
+}
+
+variable "test_rtls_listener_certificate_arn" {
+  description = "The ARN of the ACM certificate used for the TLS listener of the TEST app server NLB for RTLS connection"
+  type        = string
+  default     = "" #Example: "arn:aws:iam::123456789012:server-certificate/test_cert-123456789012"
+}
+
+variable "hub_alb_listener_certificate_arn" {
+  description = "The ARN of the ACM certificate used for the HTTPS listener of the HUB ALB"
+  type        = string
+  default     = "" #Example: "arn:aws:iam::123456789012:server-certificate/test_cert-123456789012"
+}
+
+variable "pod_alb_listener_certificate_arn" {
+  description = "The ARN of the ACM certificate used for the HTTPS listener of the POD ALB"
+  type        = string
+  default     = "" #Example: "arn:aws:iam::123456789012:server-certificate/test_cert-123456789012"
 }

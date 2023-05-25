@@ -2,6 +2,20 @@ locals {
   create_lb = var.create_lb
 }
 
+resource "aws_eip" "nlb_listeners_ips" {
+count = var.use_new_eips && var.load_balancer_type == "network" ? (var.subnets != null ? length(var.subnets) : length(var.subnet_mapping)) : 0
+
+  vpc = true
+
+  tags = merge(
+    {
+      Name = "${var.name}-eip-${count.index}"
+    },
+    var.tags,
+    var.lb_tags,
+  )
+}
+
 resource "aws_lb" "this" {
   count = local.create_lb ? 1 : 0
 
@@ -37,11 +51,11 @@ resource "aws_lb" "this" {
   }
 
   dynamic "subnet_mapping" {
-    for_each = var.subnet_mapping
+    for_each = var.subnet_mapping != null ? var.subnet_mapping : [{}]
 
     content {
-      subnet_id            = subnet_mapping.value.subnet_id
-      allocation_id        = lookup(subnet_mapping.value, "allocation_id", null)
+      subnet_id            = lookup(subnet_mapping.value, "subnet_id", null)
+      allocation_id        = var.use_new_eips == true ? aws_eip.nlb_listeners_ips[subnet_mapping.value.sub_index].id : lookup(subnet_mapping.value, "allocation_id", null)
       private_ipv4_address = lookup(subnet_mapping.value, "private_ipv4_address", null)
       ipv6_address         = lookup(subnet_mapping.value, "ipv6_address", null)
     }
@@ -172,7 +186,7 @@ resource "aws_lb_target_group_attachment" "this" {
   port              = lookup(each.value, "port", null)
   availability_zone = lookup(each.value, "availability_zone", null)
 
-  depends_on = [aws_lambda_permission.lb]
+  depends_on = [aws_lambda_permission.lb, aws_lb_listener.frontend_http_tcp, aws_lb_listener.frontend_https]
 }
 
 resource "aws_lb_listener_rule" "https_listener_rule" {

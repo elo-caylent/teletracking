@@ -63,6 +63,10 @@ output "target_group_attachments" {
   value       = { for k, v in aws_lb_target_group_attachment.this : k => v.id }
 }
 
+output "subnet_mapping" {
+  description = "LBs subnet mapping"
+  value = aws_lb.this[*].subnet_mapping
+}
 ################################################################################
 # Security Group
 ################################################################################

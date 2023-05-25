@@ -3,6 +3,11 @@ output "ec2_instance_ids" {
   value       = [for instance in aws_instance.ec2_instances : instance.id]
 }
 
+output "ec2_instances" {
+  description = "EC2 instances objects"
+  value       = aws_instance.ec2_instances
+}
+
 
 output "iam_instance_profile_name" {
   description = "Name of the created IAM instance profile"
