@@ -3,7 +3,7 @@ locals {
 }
 
 resource "aws_eip" "nlb_listeners_ips" {
-count = var.use_new_eips && var.load_balancer_type == "network" ? (var.subnets != null ? length(var.subnets) : length(var.subnet_mapping)) : 0
+count = var.use_new_eips == true ? length(var.subnet_mapping) : 0
 
   vpc = true
 

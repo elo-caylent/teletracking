@@ -1,7 +1,7 @@
 resource "aws_security_group" "hub_alb_sg" {
   name        = "hub_alb_sg"
   description = "security group for hub application load balancer"
-  vpc_id      = module.vpc.vpc_id
+  vpc_id      = module.vpc_hub.vpc_id
 
   ingress {
     description = "allowing https traffic from the internet"

@@ -52,11 +52,11 @@ module "vpc_pod" {
 
 locals {
   network_interface_subnets_ids = [for subnet in module.vpc_pod.private_subnets : subnet.id if contains(values(var.web_subnet_cidr_per_az), subnet.cidr_block) == true]
-  tgw_subnets_ids               = [for subnet in module.vpc.private_subnets : subnet.id if contains(values(var.tgw_subnet_cidr_per_az), subnet.cidr_block) == true]
+  tgw_subnets_ids               = [for subnet in module.vpc_hub.private_subnets : subnet.id if contains(values(var.tgw_subnet_cidr_per_az), subnet.cidr_block) == true]
   podtgw_subnets_ids            = [for subnet in module.vpc_pod.private_subnets : subnet.id if contains(values(var.podtgw_subnet_cidr_per_az), subnet.cidr_block) == true]
-  ingress_subnets_ids           = [for subnet in module.vpc.private_subnets : subnet.id if contains(values(var.ingress_subnet_cidr_per_az), subnet.cidr_block) == true]
-  fw_subnets_ids                = [for subnet in module.vpc.public_subnets : subnet.id if contains(values(var.fw_subnet_cidr_per_az), subnet.cidr_block) == true]
-  prv_subnets_ids               = [for subnet in module.vpc.private_subnets : subnet.id if contains(values(var.prv_subnet_cidr_per_az), subnet.cidr_block) == true]
+  ingress_subnets_ids           = [for subnet in module.vpc_hub.private_subnets : subnet.id if contains(values(var.ingress_subnet_cidr_per_az), subnet.cidr_block) == true]
+  fw_subnets_ids                = [for subnet in module.vpc_hub.public_subnets : subnet.id if contains(values(var.fw_subnet_cidr_per_az), subnet.cidr_block) == true]
+  prv_subnets_ids               = [for subnet in module.vpc_hub.private_subnets : subnet.id if contains(values(var.prv_subnet_cidr_per_az), subnet.cidr_block) == true]
   app_subnets_ids               = [for subnet in module.vpc_pod.private_subnets : subnet.id if contains(values(var.app_subnet_cidr_per_az), subnet.cidr_block) == true]
   db_subnets_ids                = [for subnet in module.vpc_pod.private_subnets : subnet.id if contains(values(var.db_subnet_cidr_per_az), subnet.cidr_block) == true]
   pod_web_subnets_ids           = [for subnet in module.vpc_pod.private_subnets : subnet.id if contains(values(var.web_subnet_cidr_per_az), subnet.cidr_block) == true]
@@ -119,7 +119,7 @@ module "endpoints" {
 module "endpoints_hub" {
   source = "./terraform/modules/vpc/modules/vpc-endpoints"
 
-  vpc_id = module.vpc.vpc_id
+  vpc_id = module.vpc_hub.vpc_id
 
   endpoints = {
     s3 = {
@@ -131,7 +131,7 @@ module "endpoints_hub" {
   }
   #tags = local.tags
 }
-
+*/
 
 module "tgw" {
   source = "./terraform/modules/tgw"
@@ -144,7 +144,7 @@ module "tgw" {
 
   vpc_attachments = {
     tgw_att_to_hub = {
-      vpc_id       = module.vpc.vpc_id
+      vpc_id       = module.vpc_hub.vpc_id
       subnet_ids   = local.tgw_subnets_ids
       dns_support  = true
       ipv6_support = false
@@ -184,7 +184,7 @@ module "managed-ad" {
   ds_managed_ad_directory_name = "dev.us1.ttiq.io"
   ds_managed_ad_password     = "MyStrongPassword123!"
   ds_managed_ad_edition        = "Standard"
-  ds_managed_ad_vpc_id         = module.vpc.vpc_id
+  ds_managed_ad_vpc_id         = module.vpc_hub.vpc_id
   ds_managed_ad_subnet_ids     = [local.prv_subnets_ids[0], local.prv_subnets_ids[2]]
 }
-*/
+

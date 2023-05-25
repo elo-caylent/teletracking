@@ -1,84 +1,3 @@
-locals {
-  subnets_for_Ingress_nlb = [local.ingress_subnets_ids]
-  subnets_for_prod_appserver_nlb = [local.prv_subnets_ids[0]]
-  subnets_for_test_appserver_nlb = [local.prv_subnets_ids[1]]
-  subnets_for_hub_alb = [local.prv_subnets_ids]
-  subnets_for_pod_lbs = local.pod_web_subnets_ids
-  health_check_for_app_tgs = {
-        enabled             = true
-        interval            = 30
-        port                = 443
-        healthy_threshold   = 5
-        unhealthy_threshold = 2
-        timeout             = 10
-        protocol            = "TCP"
-  }
-  ip_based_1hr_stickiness_nlb = {
-        enabled = true
-        type = "source_ip"
-        cookie_duration = 3600
-  }
-
-  prod_rtls_target_group = {
-      name = "prod-appserver-rtls-tg"
-      backend_protocol = "TLS"
-      backend_port     = 443
-      target_type      = "ip"
-      load_balancing_cross_zone_enabled = true
-      targets = {
-        my_target = {
-            target_id = "10.1.10.1"
-            port      = 443
-            availability_zone = "all"
-        }
-      }
-      stickiness = local.ip_based_1hr_stickiness_nlb
-      health_check = local.health_check_for_app_tgs
-  }
-  prod_appserver_target_groups = concat([prod_rtls_target_group], [for port in var.sip_ports : {name = "prod-appserver-${port}-tg", backend_protocol = "TCP_UDP", backend_port = port, target_type = "ip", load_balancing_cross_zone_enabled = true, targets = {my_target = { target_id = "10.1.10.1", port = port, availability_zone = "all"}}, stickiness = local.ip_based_1hr_stickiness_nlb, health_check = local.health_check_for_app_tgs}])
-
-  test_rtls_target_group = {
-      name = "test-appserver-rtls-tg"
-      backend_protocol = "TLS"
-      backend_port     = 443
-      target_type      = "ip"
-      load_balancing_cross_zone_enabled = true
-      targets = {
-        my_target = {
-            target_id = "10.1.10.100"
-            port      = 443
-            availability_zone = "all"
-        }
-      }
-      stickiness = local.ip_based_1hr_stickiness_nlb
-      health_check = local.health_check_for_app_tgs
-  }
-  test_appserver_target_groups = concat([test_rtls_target_group], [for port in var.sip_ports : {name = "test-appserver-${port}-tg", backend_protocol = "TCP_UDP", backend_port = port, target_type = "ip", load_balancing_cross_zone_enabled = true, targets = {my_target = { target_id = "10.1.10.100", port = port, availability_zone = "all"}}, stickiness = local.ip_based_1hr_stickiness_nlb, health_check = local.health_check_for_app_tgs}])
-
-
-  prod_app_server_tls_listnerts_nlb = [{
-      port               = 443
-      protocol           = "TLS"
-      certificate_arn    =  var.rtls_listener_certificate_arn
-      target_group_index = 0
-      stickiness = {
-        enabled = true
-      }
-  }]
-
-  test_app_server_tls_listnerts_nlb = [{
-      port               = 443
-      protocol           = "TLS"
-      certificate_arn    =  var.test_rtls_listener_certificate_arn
-      target_group_index = 0
-      stickiness = {
-        enabled = true
-      }
-  }]
-
-  sip_connection_listeners = [for port in var.sip_ports : {port = port, protocol = "TCP", target_group_index = (length(local.app_server_tls_listnerts_nlb) > 0 ? length(local.app_server_tls_listnerts_nlb) : 0) + index(var.sip_ports, port), stickiness = {enabled = true}}]
-}
-
 module "web_ingress_nlb" {
   source = "./terraform/modules/alb"
 
@@ -86,11 +5,11 @@ module "web_ingress_nlb" {
 
   load_balancer_type = "network"
 
-  vpc_id = module.vpc.vpc_id
+  vpc_id = module.vpc_hub.vpc_id
   #subnets = local.subnets_for_Ingress_nlb
   use_new_eips = true
 
-  subnet_mapping = var.use_new_eips == true ? [for sub in local.subnets_for_Ingress_nlb : { subnet_id = sub, sub_index = index(local.subnets_for_Ingress_nlb, sub) }] : null
+  subnet_mapping = [for sub in local.subnets_for_ingress_nlb : { subnet_id = sub, sub_index = index(local.subnets_for_ingress_nlb, sub) }]
 
   /*
   access_logs = {
@@ -106,7 +25,7 @@ module "web_ingress_nlb" {
       load_balancing_cross_zone_enabled = true
       targets = {
         alb_target = {
-          target_id = module.hub-alb.lb_arn
+          target_id = module.hub_alb.lb_arn
           port      = 80
         }
       }
@@ -131,7 +50,7 @@ module "web_ingress_nlb" {
       load_balancing_cross_zone_enabled = true
       targets = {
         my_target = {
-            target_id = module.hub-alb.lb_arn
+            target_id = module.hub_alb.lb_arn
             port      = 443
         }
       }
@@ -202,7 +121,7 @@ module "hub_alb" {
   }
   security_group_tags = local.tags
 
-  vpc_id  = module.vpc.vpc_id
+  vpc_id  = module.vpc_hub.vpc_id
   subnets = local.subnets_for_hub_alb
 
   /*access_logs = {
@@ -334,7 +253,7 @@ module "pod_ingress_nlb" {
       load_balancing_cross_zone_enabled = true
       targets = {
         my_target = {
-            target_id = module.hub-alb.lb_arn
+            target_id = module.hub_alb.lb_arn
             port      = 443
         }
       }
@@ -367,7 +286,7 @@ module "pod_ingress_nlb" {
   tags = local.tags
 }
 
-module "pod-alb" {
+module "pod_alb" {
   source = "./terraform/modules/alb"
 
   name = "pod-alb-mse-poc"
@@ -507,27 +426,17 @@ module "prod_appserver_nlb" {
 
   load_balancer_type = "network"
 
-  vpc_id = module.vpc.vpc_id
+  vpc_id = module.vpc_hub.vpc_id
   #subnets = local.subnets_for_Ingress_nlb
   use_new_eips = true
 
-  subnet_mapping = var.use_new_eips == true ? [for sub in local.subnets_for_prod_appserver_nlb : { subnet_id = sub, sub_index = index(local.subnets_for_prod_appserver_nlb, sub) }] : null
+  subnet_mapping = [for sub in local.subnets_for_prod_appserver_nlb : { subnet_id = sub, sub_index = index(local.subnets_for_prod_appserver_nlb, sub) }]
 
   target_groups = local.prod_appserver_target_groups
   
-  https_listeners = [
-    {
-      port               = 443
-      protocol           = "TLS"
-      certificate_arn    =  var.prod_app_server_tls_listnerts_nlb
-      target_group_index = 0
-      stickiness = {
-        enabled = true
-      }
-    }
-  ]
+  https_listeners = local.prod_app_server_tls_listnerts_nlb
 
-  http_tcp_listeners = local.sip_connection_listeners
+  http_tcp_listeners = local.prod_sip_connection_listeners
 
   tags = local.tags
 }
@@ -539,27 +448,17 @@ module "test_appserver_nlb" {
 
   load_balancer_type = "network"
 
-  vpc_id = module.vpc.vpc_id
+  vpc_id = module.vpc_hub.vpc_id
   #subnets = local.subnets_for_test_appserver_nlb
   use_new_eips = true
 
-  subnet_mapping = var.use_new_eips == true ? [for sub in local.subnets_for_test_appserver_nlb : { subnet_id = sub, sub_index = index(local.subnets_for_test_appserver_nlb, sub) }] : null
-
+  subnet_mapping = [for sub in local.subnets_for_test_appserver_nlb : { subnet_id = sub, sub_index = index(local.subnets_for_test_appserver_nlb, sub) }]
+  
   target_groups = local.test_appserver_target_groups
   
-  https_listeners = [
-    {
-      port               = 443
-      protocol           = "TLS"
-      certificate_arn    =  var.test_app_server_tls_listnerts_nlb
-      target_group_index = 0
-      stickiness = {
-        enabled = true
-      }
-    }
-  ]
+  https_listeners = local.test_app_server_tls_listnerts_nlb
 
-  http_tcp_listeners = local.sip_connection_listeners
+  http_tcp_listeners = local.test_sip_connection_listeners
 
   tags = local.tags
 }
