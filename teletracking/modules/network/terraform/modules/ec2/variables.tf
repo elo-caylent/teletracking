@@ -17,3 +17,10 @@ variable "iam_instance_profile" {
   description = "Name of the IAM instance profile"
   type        = string
 }
+
+variable "private_ip" {
+  type        = string
+  description = "Private IP address to associate with the instance in the VPC"
+  default     = null
+}
+

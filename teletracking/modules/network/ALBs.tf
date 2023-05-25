@@ -1,4 +1,4 @@
-module "hub-alb" {
+/*module "hub-alb" {
   source = "./terraform/modules/alb"
 
   name = "hub-alb-mse-poc"
@@ -66,4 +66,4 @@ module "hub-alb" {
   tags = {
     Environment = "Test"
   }
-}
+}*/

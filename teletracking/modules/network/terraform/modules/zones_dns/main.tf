@@ -1,4 +1,5 @@
-resource "aws_route53_zone" "dns_zones" {
+# Create the DNS zones
+resource "aws_route53_zone" "zones" {
   for_each = var.zones
 
   name        = each.key

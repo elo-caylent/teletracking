@@ -199,7 +199,7 @@ variable "ami_id" {
 variable "instance_type" {
   description = "default instance type for ec2 resources "
   type        = string
-  default     = "t3a.xlarge"
+  default     = "t3.xlarge"
 }
 variable "volume_sizes" {
   description = "default volume size for ec2 resources "

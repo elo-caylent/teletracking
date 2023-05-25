@@ -1,7 +1,7 @@
-/*locals {
-  zone_name = sort(keys(module.zones.route53_zone_zone_id))[0]
-  zone_id = module.zones.route53_zone_zone_id["terraform-aws-modules-example.com"]
-}*/
+
+locals {
+  zone_name = module.zones.zone_name[0]
+}
 
 module "zones" {
   source  = "./terraform/modules/zones_dns"
@@ -18,28 +18,12 @@ module "zones" {
 }
 
 
-/*module "records" {
+module "records" {
   source  = "./terraform/modules/records"
 
   zone_name = local.zone_name
 
   records = [
-    {
-      name = "bus-sandbox-firewall-firmware80.dev.us1.ttiq.io"
-      type = "A"
-      alias = {
-        name    = "rufus-edge-nlb-a92c348dfbde8e77.elb.us-east-1.amazonaws.com."
-        zone_id = module.zones.route53_zone_zone_id
-      }
-    },
-    {
-      name = "cloudbasix.dev.us1.ttiq.io"
-      type = "A"
-      ttl  = 300
-      records = [
-        "10.1.16.125",
-      ]
-    },
     {
       name = "cms-prod-app-mse-poc.dev.us1.ttiq.io"
       type = "A"
@@ -81,30 +65,6 @@ module "zones" {
       ]
     },
     {
-      name = "ecs-module-test.dev.us1.ttiq.io"
-      type = "A"
-      alias = {
-        name    = "ecsmod20220919180211415000000001-65d4ca3d702e7310.elb.us-east-1.amazonaws.com."
-        zone_id = module.zones.route53_zone_zone_id
-      }
-    },
-    {
-      name = "firewall-firmware80.dev.us1.ttiq.io"
-      type = "A"
-      alias = {
-        name    = "rufus-edge-nlb-a92c348dfbde8e77.elb.us-east-1.amazonaws.com."
-        zone_id = module.zones.route53_zone_zone_id
-      }
-    },
-    {
-      name = "ingress.dev.us1.ttiq.io"
-      type = "A"
-      ttl  = 60
-      records = [
-        "10.0.3.10",
-      ]
-    },
-    {
       name = "iq-connector-mse-poc.dev.us1.ttiq.io"
       type = "A"
       ttl  = 300
@@ -112,44 +72,16 @@ module "zones" {
         "10.1.160.182",
       ]
     },
-    {
-      name = "monitoring-sandbox-firewall-firmware80.dev.us1.ttiq.io"
-      type = "A"
-      alias = {
-        name    = "rufus-edge-nlb-a92c348dfbde8e77.elb.us-east-1.amazonaws.com."
-        zone_id = module.zones.route53_zone_zone_id
-      }
-    },
-    {
-      name = "search.dev.us1.ttiq.io"
-      type = "CNAME"
-      ttl  = 60
-      records = ["www.google.com2"]
-    },
-    {
-      name = "sensor_red.dev.us1.ttiq.io"
-      type = "CNAME"
-      ttl  = 300
-      records = ["ip-10-0-0-14.ec2.internal"]
-    },
-    {
+    /*{
       name = "teletracking.dev.us1.ttiq.io"
       type = "A"
       alias = {
         name    = "pod-nlb-mse-poc-c267352b69f0bf36.elb.us-east-1.amazonaws.com."
-        zone_id = module.zones.route53_zone_zone_id
+        zone_id = module.zones.zone_ids
       }
-    },
-    {
-      name = "viewservice.dev.us1.ttiq.io"
-      type = "A"
-      alias = {
-        name    = "ecsmod-viewservice-nlb-3db088322d6e707b.elb.us-east-1.amazonaws.com."
-        zone_id = module.zones.route53_zone_zone_id
-      }
-    }
+    }*/
   ]
 
   depends_on = [module.zones]
-}*/
+}
 
