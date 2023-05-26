@@ -32,6 +32,10 @@ module "vpc_hub" {
   single_nat_gateway     = false
   one_nat_gateway_per_az = true
   enable_vpn_gateway     = false
+  enable_flow_log           = true
+  flow_log_destination_type = "s3"
+  bucket_name = "hub-fl-s3-bucket"
+  flow_log_destination_arn  = module.vpc_hub.s3_bucket_arn
 
   #tags = local.tags
 
@@ -40,10 +44,14 @@ module "vpc_hub" {
 
 
 module "vpc_pod" {
-  source = "./terraform/modules/vpc_pod"
+  source = "./terraform/modules/vpc"
 
   name = "pod-jesus"
   cidr = var.vpc_cidr_pod
+  enable_flow_log           = true
+  flow_log_destination_type = "s3"
+  bucket_name = "pod-fl-s3-bucket"
+  flow_log_destination_arn  = module.vpc_hub.s3_bucket_arn
 
   azs             = var.az_pod
   private_subnets = local.pod_private_subnets
@@ -62,8 +70,8 @@ locals {
   pod_web_subnets_ids           = [for subnet in module.vpc_pod.private_subnets : subnet.id if contains(values(var.web_subnet_cidr_per_az), subnet.cidr_block) == true]
 }
 
-/*
-module "endpoints" {
+
+module "endpoints_pod" {
   source = "./terraform/modules/vpc/modules/vpc-endpoints"
 
   vpc_id = module.vpc_pod.vpc_id
@@ -116,6 +124,7 @@ module "endpoints" {
   }
   #tags = local.tags
 }
+
 module "endpoints_hub" {
   source = "./terraform/modules/vpc/modules/vpc-endpoints"
 
@@ -131,7 +140,7 @@ module "endpoints_hub" {
   }
   #tags = local.tags
 }
-*/
+
 
 module "tgw" {
   source = "./terraform/modules/tgw"

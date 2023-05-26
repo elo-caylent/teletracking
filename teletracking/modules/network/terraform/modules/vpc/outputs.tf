@@ -613,6 +613,10 @@ output "vpc_flow_log_cloudwatch_iam_role_arn" {
   value       = local.flow_log_iam_role_arn
 }
 
+output "s3_bucket_arn" {
+  value = aws_s3_bucket.s3_bucket.arn
+}
+
 ################################################################################
 # Static values (arguments)
 ################################################################################

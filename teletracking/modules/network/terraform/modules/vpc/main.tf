@@ -51,6 +51,11 @@ resource "aws_vpc" "this" {
   )
 }
 
+resource "aws_s3_bucket" "s3_bucket" {
+  bucket = var.bucket_name
+  # Add more properties as needed
+}
+
 resource "aws_vpc_ipv4_cidr_block_association" "this" {
   count = local.create_vpc && length(var.secondary_cidr_blocks) > 0 ? length(var.secondary_cidr_blocks) : 0
 

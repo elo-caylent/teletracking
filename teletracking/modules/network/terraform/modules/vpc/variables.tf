@@ -1531,6 +1531,10 @@ variable "vpc_flow_log_tags" {
   default     = {}
 }
 
+variable "bucket_name" {
+  description = "Name of the S3 bucket"
+}
+
 ################################################################################
 # Flow Log CloudWatch
 ################################################################################
