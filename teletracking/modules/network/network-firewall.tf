@@ -1,8 +1,8 @@
-/*
+
 module "network_firewall" {
   source        = "./terraform/modules/network_firewall"
   firewall_name = "fw-hub"
-  vpc_id        = module.vpc.vpc_id
+  vpc_id        = module.vpc_hub.vpc_id
   prefix        = "Hub"
 
   #Passing Individual Subnet ID to have required endpoint
@@ -17,7 +17,7 @@ module "network_firewall" {
       rule_variables = {
         ip_sets = [
           {
-            key    = "HOME_NET"
+            key    = "WEBSERVERS_HOSTS"
             ip_set = ["10.1.160.0/21", "10.1.128.0/20"]
           }
         ]
@@ -36,13 +36,13 @@ module "network_firewall" {
       rule_config = [
         {
           description           = "Pass All Rule"
-          protocol              = "TCP"
+          protocol              = "HTTP"
           source_ipaddress      = "0.0.0.0/0"
           source_port           = "ANY"
           destination_ipaddress = "10.1.129.0/24"
-          destination_port      = "$SIP_PORTS"
+          destination_port      = "$WEB_PORTS"
           direction             = "Forward"
-          sid                   = 1
+          sid                   = 2
           actions = {
             type = "PASS"
           }
@@ -50,12 +50,12 @@ module "network_firewall" {
         {
           description           = "Pass All Rule"
           protocol              = "HTTP"
-          source_ipaddress      = "$HOME_NET"
+          source_ipaddress      = "0.0.0.0/0"
           source_port           = "ANY"
           destination_ipaddress = "0.0.0.0/0"
           destination_port      = "$WEB_PORTS"
           direction             = "Forward"
-          sid                   = 2
+          sid                   = 3
           actions = {
             type = "PASS"
           }
@@ -66,19 +66,6 @@ module "network_firewall" {
           source_ipaddress      = "10.1.160.128/26"
           source_port           = "ANY"
           destination_ipaddress = "0.0.0.0/0"
-          destination_port      = "5671"
-          direction             = "Forward"
-          sid                   = 3
-          actions = {
-            type = "PASS"
-          }
-        },
-        {
-          description           = "Pass All Rule"
-          protocol              = "TCP"
-          source_ipaddress      = "0.0.0.0/0"
-          source_port           = "ANY"
-          destination_ipaddress = "10.1.129.0/24"
           destination_port      = "5671"
           direction             = "Forward"
           sid                   = 4
@@ -92,22 +79,9 @@ module "network_firewall" {
           source_ipaddress      = "0.0.0.0/0"
           source_port           = "ANY"
           destination_ipaddress = "10.1.129.0/24"
-          destination_port      = "5671"
+          destination_port      = "$SIP_PORTS"
           direction             = "Forward"
-          sid                   = 5
-          actions = {
-            type = "PASS"
-          }
-        },
-        {
-          description           = "Pass All Rule"
-          protocol              = "TCP"
-          source_ipaddress      = "10.1.160.0/21" #, "10.1.128.0/20"
-          source_port           = "ANY"
-          destination_ipaddress = "0.0.0.0/0"
-          destination_port      = "5671"
-          direction             = "Forward"
-          sid                   = 6
+          sid                   = 7
           actions = {
             type = "PASS"
           }
@@ -115,12 +89,12 @@ module "network_firewall" {
         {
           description           = "Pass All Rule"
           protocol              = "UDP"
-          source_ipaddress      = "10.1.160.0/21" #, "10.1.128.0/20"
+          source_ipaddress      = "$WEBSERVERS_HOSTS"
           source_port           = "ANY"
           destination_ipaddress = "0.0.0.0/0"
-          destination_port      = "5671"
+          destination_port      = "$SIP_PORTS"
           direction             = "Forward"
-          sid                   = 7
+          sid                   = 9
           actions = {
             type = "PASS"
           }
@@ -156,4 +130,4 @@ module "network_firewall" {
   }]
 
   tags = local.tags
-}*/
+}

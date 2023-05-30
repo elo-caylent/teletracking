@@ -4,7 +4,7 @@ locals {
 }
 
 module "zones" {
-  source  = "./terraform/modules/zones_dns"
+  source = "./terraform/modules/zones_dns"
 
   zones = {
     "dev.us1.ttiq.io" = {
@@ -19,7 +19,7 @@ module "zones" {
 
 
 module "records" {
-  source  = "./terraform/modules/records"
+  source = "./terraform/modules/records"
 
   zone_name = local.zone_name
 
@@ -72,14 +72,14 @@ module "records" {
         "10.1.160.182",
       ]
     },
-    /*{
+    {
       name = "teletracking.dev.us1.ttiq.io"
       type = "A"
       alias = {
-        name    = "pod-nlb-mse-poc-c267352b69f0bf36.elb.us-east-1.amazonaws.com."
-        zone_id = module.zones.zone_ids
+        name    = "teletracking.dev.us1.ttiq.io"
+        zone_id = module.pod_ingress_nlb.lb_dns_name
       }
-    }*/
+    }
   ]
 
   depends_on = [module.zones]

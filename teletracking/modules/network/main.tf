@@ -1,75 +1,55 @@
-locals {
-  tags = {
-    Name               = "${var.environment}-vpc"
-    environment        = "${var.environment}"
-    costcenter         = "${var.costcenter}"
-    space              = "${var.space}"
-    serviceline        = "${var.serviceline}"
-    dataclassification = "${var.dataclassification}"
-    map-migrated       = "${var.map_migrated}"
-  }
-  private_subnets      = concat(values(var.prv_subnet_cidr_per_az), values(var.tgw_subnet_cidr_per_az), values(var.ingress_subnet_cidr_per_az))
-  pod_private_subnets  = concat(values(var.podtgw_subnet_cidr_per_az), values(var.web_subnet_cidr_per_az), values(var.app_subnet_cidr_per_az), values(var.db_subnet_cidr_per_az))
-  public_subnets       = values(var.fw_subnet_cidr_per_az)
-  ingress_subnets_cidr = values(var.ingress_subnet_cidr_per_az)
-  podtgw_subnet_cidr   = values(var.podtgw_subnet_cidr_per_az)
-  websubnet_ids        = values(var.web_subnet_cidr_per_az)
 
-
-}
-
+################################################################################
+# HUB VPC Module
+################################################################################
 module "vpc_hub" {
   source = "./terraform/modules/vpc"
 
   name = "hub-jesus"
   cidr = var.vpc_cidr
 
-  azs                    = var.az
-  private_subnets        = local.private_subnets
-  public_subnets         = local.public_subnets
-  nat_subnets            = local.ingress_subnets_cidr
-  enable_nat_gateway     = true
-  single_nat_gateway     = false
-  one_nat_gateway_per_az = true
-  enable_vpn_gateway     = false
+  azs                       = var.az
+  private_subnets           = local.private_subnets
+  public_subnets            = local.public_subnets
+  nat_subnets               = local.ingress_subnets_ids
+  enable_nat_gateway        = true
+  single_nat_gateway        = false
+  one_nat_gateway_per_az    = true
+  enable_vpn_gateway        = false
   enable_flow_log           = true
   flow_log_destination_type = "s3"
-  bucket_name = "hub-fl-s3-bucket"
+  bucket_name               = "hub-fl-s3-bucket"
   flow_log_destination_arn  = module.vpc_hub.s3_bucket_arn
 
-  #tags = local.tags
+  tags = local.tags
 
 
 }
 
+################################################################################
+# POD VPC Module
+################################################################################
 
 module "vpc_pod" {
   source = "./terraform/modules/vpc"
 
-  name = "pod-jesus"
-  cidr = var.vpc_cidr_pod
+  name                      = "pod-jesus"
+  cidr                      = var.vpc_cidr_pod
   enable_flow_log           = true
   flow_log_destination_type = "s3"
-  bucket_name = "pod-fl-s3-bucket"
-  flow_log_destination_arn  = module.vpc_hub.s3_bucket_arn
+  bucket_name               = "pod-fl-s3-bucket"
+  flow_log_destination_arn  = module.vpc_pod.s3_bucket_arn
 
   azs             = var.az_pod
   private_subnets = local.pod_private_subnets
-  #tags = local.tags
+  tags = local.tags
 }
 
-locals {
-  network_interface_subnets_ids = [for subnet in module.vpc_pod.private_subnets : subnet.id if contains(values(var.web_subnet_cidr_per_az), subnet.cidr_block) == true]
-  tgw_subnets_ids               = [for subnet in module.vpc_hub.private_subnets : subnet.id if contains(values(var.tgw_subnet_cidr_per_az), subnet.cidr_block) == true]
-  podtgw_subnets_ids            = [for subnet in module.vpc_pod.private_subnets : subnet.id if contains(values(var.podtgw_subnet_cidr_per_az), subnet.cidr_block) == true]
-  ingress_subnets_ids           = [for subnet in module.vpc_hub.private_subnets : subnet.id if contains(values(var.ingress_subnet_cidr_per_az), subnet.cidr_block) == true]
-  fw_subnets_ids                = [for subnet in module.vpc_hub.public_subnets : subnet.id if contains(values(var.fw_subnet_cidr_per_az), subnet.cidr_block) == true]
-  prv_subnets_ids               = [for subnet in module.vpc_hub.private_subnets : subnet.id if contains(values(var.prv_subnet_cidr_per_az), subnet.cidr_block) == true]
-  app_subnets_ids               = [for subnet in module.vpc_pod.private_subnets : subnet.id if contains(values(var.app_subnet_cidr_per_az), subnet.cidr_block) == true]
-  db_subnets_ids                = [for subnet in module.vpc_pod.private_subnets : subnet.id if contains(values(var.db_subnet_cidr_per_az), subnet.cidr_block) == true]
-  pod_web_subnets_ids           = [for subnet in module.vpc_pod.private_subnets : subnet.id if contains(values(var.web_subnet_cidr_per_az), subnet.cidr_block) == true]
-}
 
+
+################################################################################
+# POD ENDPOINT Module
+################################################################################
 
 module "endpoints_pod" {
   source = "./terraform/modules/vpc/modules/vpc-endpoints"
@@ -122,9 +102,12 @@ module "endpoints_pod" {
       subnet_ids = local.network_interface_subnets_ids
     },
   }
-  #tags = local.tags
+  tags = local.tags
 }
 
+################################################################################
+# HUB ENDPOINT Module
+################################################################################
 module "endpoints_hub" {
   source = "./terraform/modules/vpc/modules/vpc-endpoints"
 
@@ -138,9 +121,12 @@ module "endpoints_hub" {
       tags            = { Name = "hub-s3-gw-endpoint" }
     },
   }
-  #tags = local.tags
+  tags = local.tags
 }
 
+################################################################################
+# TRANSIT GATEWAY Module
+################################################################################
 
 module "tgw" {
   source = "./terraform/modules/tgw"
@@ -184,16 +170,18 @@ module "tgw" {
 
   ram_allow_external_principals = true
 
-  #tags = local.tags
+  tags = local.tags
 }
 
+################################################################################
+# MANAGED AD Module
+################################################################################
 module "managed-ad" {
-  source  = "./terraform/modules/managed-ad"
+  source = "./terraform/modules/managed-ad"
 
   ds_managed_ad_directory_name = "dev.us1.ttiq.io"
-  ds_managed_ad_password     = "MyStrongPassword123!"
+  ds_managed_ad_password       = "MyStrongPassword123!"
   ds_managed_ad_edition        = "Standard"
   ds_managed_ad_vpc_id         = module.vpc_hub.vpc_id
   ds_managed_ad_subnet_ids     = [local.prv_subnets_ids[0], local.prv_subnets_ids[2]]
 }
-

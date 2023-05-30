@@ -1029,7 +1029,7 @@ resource "aws_route" "private_ipv6_egress" {
 locals {
   nat_gateway_count = var.single_nat_gateway ? 1 : var.one_nat_gateway_per_az ? length(var.azs) : local.max_subnet_length
   nat_gateway_ips   = var.reuse_nat_ips ? var.external_nat_ip_ids : try(aws_eip.nat[*].id, [])
-  nat_subnets_ids = [for subnet in aws_subnet.private : subnet.id if contains(var.nat_subnets, subnet.cidr_block) == true]
+  #nat_subnets_ids = [for subnet in aws_subnet.private : subnet.id if contains(var.nat_subnets, subnet.cidr_block) == true]
 }
 
 resource "aws_eip" "nat" {
@@ -1057,7 +1057,7 @@ resource "aws_nat_gateway" "this" {
     var.single_nat_gateway ? 0 : count.index,
   )
   subnet_id = element(
-    local.nat_subnets_ids,
+    var.nat_subnets,
     var.single_nat_gateway ? 0 : count.index,
   )
 

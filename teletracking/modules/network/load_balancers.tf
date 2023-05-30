@@ -43,15 +43,15 @@ module "web_ingress_nlb" {
       }
     },
     {
-      name = "hub-alb-https-target"
-      backend_protocol = "TCP"
-      backend_port     = 443
-      target_type      = "alb"
+      name                              = "hub-alb-https-target"
+      backend_protocol                  = "TCP"
+      backend_port                      = 443
+      target_type                       = "alb"
       load_balancing_cross_zone_enabled = true
       targets = {
         my_target = {
-            target_id = module.hub_alb.lb_arn
-            port      = 443
+          target_id = module.hub_alb.lb_arn
+          port      = 443
         }
       }
       stickiness = local.ip_based_1hr_stickiness_nlb
@@ -231,12 +231,12 @@ module "pod_ingress_nlb" {
   name = "pod-ingress-nlb"
 
   load_balancer_type = "network"
-  internal = true
+  internal           = true
 
-  vpc_id = module.vpc_pod.vpc_id
+  vpc_id       = module.vpc_pod.vpc_id
   use_new_eips = var.use_new_eips
 
-  subnet_mapping = [for subnet in module.vpc_pod.private_subnets : {subnet_id = subnet.id, private_ipv4_address = "${split(".", split("/", subnet.cidr_block)[0])[0]}.${split(".", split("/", subnet.cidr_block)[0])[1]}.${split(".", split("/", subnet.cidr_block)[0])[2]}.${tonumber(split(".", split("/", subnet.cidr_block)[0])[3]) + var.ip_address_position}"} if contains(values(var.web_subnet_cidr_per_az), subnet.cidr_block) == true]
+  subnet_mapping = [for subnet in module.vpc_pod.private_subnets : { subnet_id = subnet.id, private_ipv4_address = "${split(".", split("/", subnet.cidr_block)[0])[0]}.${split(".", split("/", subnet.cidr_block)[0])[1]}.${split(".", split("/", subnet.cidr_block)[0])[2]}.${tonumber(split(".", split("/", subnet.cidr_block)[0])[3]) + var.ip_address_position}" } if contains(values(var.web_subnet_cidr_per_az), subnet.cidr_block) == true]
 
 
   /*
@@ -246,15 +246,15 @@ module "pod_ingress_nlb" {
 
   target_groups = [
     {
-      name = "pod-alb-https-target"
-      backend_protocol = "TCP"
-      backend_port     = 443
-      target_type      = "alb"
+      name                              = "pod-alb-https-target"
+      backend_protocol                  = "TCP"
+      backend_port                      = 443
+      target_type                       = "alb"
       load_balancing_cross_zone_enabled = true
       targets = {
         my_target = {
-            target_id = module.hub_alb.lb_arn
-            port      = 443
+          target_id = module.hub_alb.lb_arn
+          port      = 443
         }
       }
       stickiness = local.ip_based_1hr_stickiness_nlb
@@ -292,7 +292,7 @@ module "pod_alb" {
   name = "pod-alb-mse-poc"
 
   load_balancer_type = "application"
-  internal = true
+  internal           = true
 
   create_security_group      = true
   security_group_name        = "pod-alb-sg"
@@ -332,12 +332,12 @@ module "pod_alb" {
       target_type      = "instance"
       targets = {
         my_target = {
-          target_id         = module.ec2_instances.ec2_instances["CMS-Web"].id
-          port              = 443
+          target_id = module.ec2_instances.ec2_instances["CMS-Web"].id
+          port      = 443
         }
         my_other_target = {
-          target_id         = module.ec2_instances.ec2_instances["CMS-Web-2"].id
-          port              = 443
+          target_id = module.ec2_instances.ec2_instances["CMS-Web-2"].id
+          port      = 443
         }
       }
       stickiness = {
@@ -433,7 +433,7 @@ module "prod_appserver_nlb" {
   subnet_mapping = [for sub in local.subnets_for_prod_appserver_nlb : { subnet_id = sub, sub_index = index(local.subnets_for_prod_appserver_nlb, sub) }]
 
   target_groups = local.prod_appserver_target_groups
-  
+
   https_listeners = local.prod_app_server_tls_listnerts_nlb
 
   http_tcp_listeners = local.prod_sip_connection_listeners
@@ -453,9 +453,9 @@ module "test_appserver_nlb" {
   use_new_eips = true
 
   subnet_mapping = [for sub in local.subnets_for_test_appserver_nlb : { subnet_id = sub, sub_index = index(local.subnets_for_test_appserver_nlb, sub) }]
-  
+
   target_groups = local.test_appserver_target_groups
-  
+
   https_listeners = local.test_app_server_tls_listnerts_nlb
 
   http_tcp_listeners = local.test_sip_connection_listeners

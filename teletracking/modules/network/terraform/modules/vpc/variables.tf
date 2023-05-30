@@ -8,7 +8,7 @@ variable "create_vpc" {
   default     = true
 }
 variable "nat_subnets" {
-  description = "Controls if VPC should be created (it affects almost all resources)"
+  description = "It specifies the subnets IDs to be used for NAT Gateway Placement"
   type        = list(string)
   default     = []
 }
