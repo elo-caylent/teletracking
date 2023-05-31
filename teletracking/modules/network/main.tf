@@ -5,7 +5,7 @@
 module "vpc_hub" {
   source = "./terraform/modules/vpc"
 
-  name = "hub-jesus"
+  name = "hub"
   cidr = var.vpc_cidr
 
   azs                       = var.az
@@ -33,7 +33,7 @@ module "vpc_hub" {
 module "vpc_pod" {
   source = "./terraform/modules/vpc"
 
-  name                      = "pod-jesus"
+  name                      = "pod"
   cidr                      = var.vpc_cidr_pod
   enable_flow_log           = true
   flow_log_destination_type = "s3"

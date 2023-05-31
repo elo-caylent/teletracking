@@ -3,9 +3,9 @@ locals {
   private_subnets      = concat(values(var.prv_subnet_cidr_per_az), values(var.tgw_subnet_cidr_per_az), values(var.ingress_subnet_cidr_per_az))
   pod_private_subnets  = concat(values(var.podtgw_subnet_cidr_per_az), values(var.web_subnet_cidr_per_az), values(var.app_subnet_cidr_per_az), values(var.db_subnet_cidr_per_az))
   public_subnets       = values(var.fw_subnet_cidr_per_az)
-  ingress_subnets_cidr = values(var.ingress_subnet_cidr_per_az)
+  /*ingress_subnets_cidr = values(var.ingress_subnet_cidr_per_az)
   podtgw_subnet_cidr   = values(var.podtgw_subnet_cidr_per_az)
-  websubnet_ids        = values(var.web_subnet_cidr_per_az)
+  websubnet_ids        = values(var.web_subnet_cidr_per_az)*/
 
   network_interface_subnets_ids = [for subnet in module.vpc_pod.private_subnets : subnet.id if contains(values(var.web_subnet_cidr_per_az), subnet.cidr_block) == true]
   tgw_subnets_ids               = [for subnet in module.vpc_hub.private_subnets : subnet.id if contains(values(var.tgw_subnet_cidr_per_az), subnet.cidr_block) == true]
