@@ -10,9 +10,8 @@ resource "aws_ec2_transit_gateway_route_table" "att_rt" {
     transit_gateway_id = var.transit_gateway_hub_id
 
     tags = merge(
-        var.tags,
         { Name = var.rt_name != "" ? var.rt_name : "${var.attachment_id}_rt" },
-        var.tags,
+        #var.tags,
     )
 }
 
@@ -29,7 +28,7 @@ resource "aws_ec2_transit_gateway_route" "custome_route" {
 resource "aws_ec2_transit_gateway_route_table_propagation" "rt_propagation" {
   count = local.propagated_routes_count
 
-  transit_gateway_attachment_id  = var.attachment_id
+  transit_gateway_attachment_id  = var.tgw_propagated_routes.origin_attachments[count.index]
   transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.att_rt.id
 }
 

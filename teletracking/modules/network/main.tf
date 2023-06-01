@@ -50,7 +50,7 @@ module "vpc_pod" {
 ################################################################################
 # POD ENDPOINT Module
 ################################################################################
-
+/*
 module "endpoints_pod" {
   source = "./terraform/modules/vpc/modules/vpc-endpoints"
 
@@ -123,7 +123,7 @@ module "endpoints_hub" {
   }
   tags = local.tags
 }
-
+*/
 ################################################################################
 # TRANSIT GATEWAY Module
 ################################################################################
@@ -141,14 +141,17 @@ module "tgw" {
     tgw_att_to_hub = {
       vpc_id       = module.vpc_hub.vpc_id
       subnet_ids   = local.tgw_subnets_ids
+      appliance_mode_support = true
       dns_support  = true
       ipv6_support = false
       name         = "tgw_att_to_hub"
 
       tgw_routes = [
         {
-          destination_cidr_block = "10.1.160.0/21"
-          name                   = "tgw-hub-attch-rt"
+          destination_cidr_block = "10.1.128.0/20"
+        },
+        {
+          destination_cidr_block = "0.0.0.0/0"
         }
       ]
     },
@@ -161,8 +164,7 @@ module "tgw" {
 
       tgw_routes = [
         {
-          destination_cidr_block = "0.0.0.0/0"
-          name                   = "tgw-pod-attch-rt"
+          destination_cidr_block = "10.1.160.0/21"
         }
       ]
     }
@@ -170,12 +172,30 @@ module "tgw" {
 
   ram_allow_external_principals = true
 
+  #tags = local.tags
+}
+
+module "tgw-routing" {
+  source = "./terraform/modules/tgw/modules/tgw-routing"
+  count = length(local.tgw_routing_information)
+
+  rt_name = local.tgw_routing_information[count.index].rt_name
+
+  attachment_id = local.tgw_routing_information[count.index].attachment_id
+  
+  transit_gateway_hub_id = local.tgw_routing_information[count.index].transit_gateway_hub_id
+  
+  tgw_custome_routes = local.tgw_routing_information[count.index].tgw_custome_routes
+  
+  tgw_propagated_routes = local.tgw_routing_information[count.index].tgw_propagated_routes
+
   tags = local.tags
 }
 
 ################################################################################
 # MANAGED AD Module
 ################################################################################
+/*
 module "managed-ad" {
   source = "./terraform/modules/managed-ad"
 
@@ -185,3 +205,4 @@ module "managed-ad" {
   ds_managed_ad_vpc_id         = module.vpc_hub.vpc_id
   ds_managed_ad_subnet_ids     = [local.prv_subnets_ids[0], local.prv_subnets_ids[2]]
 }
+*/

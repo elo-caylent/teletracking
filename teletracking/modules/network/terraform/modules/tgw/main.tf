@@ -77,7 +77,7 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "this" {
 
   tags = merge(
     var.tags,
-    { Name = var.name },
+    { Name = "${var.name}-${each.value.name}"},
     var.tgw_vpc_attachment_tags,
     try(each.value.tags, {}),
   )
@@ -94,7 +94,7 @@ resource "aws_ec2_transit_gateway_route_table" "this" {
 
   tags = merge(
     var.tags,
-    { Name = var.name },
+    { Name = "${var.name}-route-table" },
     var.tgw_route_table_tags,
   )
 }

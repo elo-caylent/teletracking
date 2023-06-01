@@ -1,8 +1,7 @@
-
 module "network_firewall" {
   source        = "./terraform/modules/network_firewall"
   firewall_name = "fw-hub"
-  vpc_id        = module.vpc_hub.vpc_id
+  vpc_id        = module.vpc.vpc_id
   prefix        = "Hub"
 
   #Passing Individual Subnet ID to have required endpoint
@@ -17,7 +16,7 @@ module "network_firewall" {
       rule_variables = {
         ip_sets = [
           {
-            key    = "WEBSERVERS_HOSTS"
+            key    = "HOME_NET"
             ip_set = ["10.1.160.0/21", "10.1.128.0/20"]
           }
         ]
@@ -36,13 +35,13 @@ module "network_firewall" {
       rule_config = [
         {
           description           = "Pass All Rule"
-          protocol              = "HTTP"
+          protocol              = "TCP"
           source_ipaddress      = "0.0.0.0/0"
           source_port           = "ANY"
           destination_ipaddress = "10.1.129.0/24"
-          destination_port      = "$WEB_PORTS"
+          destination_port      = "$SIP_PORTS"
           direction             = "Forward"
-          sid                   = 2
+          sid                   = 1
           actions = {
             type = "PASS"
           }
@@ -50,12 +49,12 @@ module "network_firewall" {
         {
           description           = "Pass All Rule"
           protocol              = "HTTP"
-          source_ipaddress      = "0.0.0.0/0"
+          source_ipaddress      = "$HOME_NET"
           source_port           = "ANY"
           destination_ipaddress = "0.0.0.0/0"
           destination_port      = "$WEB_PORTS"
           direction             = "Forward"
-          sid                   = 3
+          sid                   = 2
           actions = {
             type = "PASS"
           }
@@ -66,6 +65,19 @@ module "network_firewall" {
           source_ipaddress      = "10.1.160.128/26"
           source_port           = "ANY"
           destination_ipaddress = "0.0.0.0/0"
+          destination_port      = "5671"
+          direction             = "Forward"
+          sid                   = 3
+          actions = {
+            type = "PASS"
+          }
+        },
+        {
+          description           = "Pass All Rule"
+          protocol              = "TCP"
+          source_ipaddress      = "0.0.0.0/0"
+          source_port           = "ANY"
+          destination_ipaddress = "10.1.129.0/24"
           destination_port      = "5671"
           direction             = "Forward"
           sid                   = 4
@@ -79,9 +91,22 @@ module "network_firewall" {
           source_ipaddress      = "0.0.0.0/0"
           source_port           = "ANY"
           destination_ipaddress = "10.1.129.0/24"
-          destination_port      = "$SIP_PORTS"
+          destination_port      = "5671"
           direction             = "Forward"
-          sid                   = 7
+          sid                   = 5
+          actions = {
+            type = "PASS"
+          }
+        },
+        {
+          description           = "Pass All Rule"
+          protocol              = "TCP"
+          source_ipaddress      = "10.1.160.0/21" #, "10.1.128.0/20"
+          source_port           = "ANY"
+          destination_ipaddress = "0.0.0.0/0"
+          destination_port      = "5671"
+          direction             = "Forward"
+          sid                   = 6
           actions = {
             type = "PASS"
           }
@@ -89,12 +114,12 @@ module "network_firewall" {
         {
           description           = "Pass All Rule"
           protocol              = "UDP"
-          source_ipaddress      = "$WEBSERVERS_HOSTS"
+          source_ipaddress      = "10.1.160.0/21" #, "10.1.128.0/20"
           source_port           = "ANY"
           destination_ipaddress = "0.0.0.0/0"
-          destination_port      = "$SIP_PORTS"
+          destination_port      = "5671"
           direction             = "Forward"
-          sid                   = 9
+          sid                   = 7
           actions = {
             type = "PASS"
           }

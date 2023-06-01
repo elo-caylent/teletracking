@@ -188,7 +188,26 @@ variable "transit_gateway_hub_id" {
   type        = string
 }
 */
-
+################################################################################
+#  TGW ROUTING
+################################################################################
+/*
+variable "tgw_routing_information" {
+  description = "A list of objects containing the routing information per attachement id"
+  type = list(object({
+            rt_name = optional(string, null)
+            attachment_id = optional(string, null)
+            transit_gateway_hub_id = optional(string, null)
+            tgw_custome_routes = optional(list(object(
+            {
+              destination_cidr_block = optional(string, null)
+              blackhole              = optional(bool, null)
+              destination_attachment = optional(string, null)
+            })), null)
+            tgw_propagated_routes = optional(list(object({origin_attachments = optional(list(string), null)})), null)
+          }))
+}
+*/
 #EC2#
 variable "ami_id" {
   description = "default ami for cms ec2 resources "
@@ -278,7 +297,7 @@ variable "pod_alb_listener_certificate_arn" {
 }
 
 #RDS#
-
+/*
 variable "identifier" {
   description = "The name of the RDS instance"
   type        = string
@@ -765,7 +784,7 @@ variable "network_type" {
   type        = string
   default     = null
 }
-
+*/
 ################################################################################
 # CloudWatch Log Group
 ################################################################################

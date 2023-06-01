@@ -33,6 +33,42 @@ locals {
   region  = "us-east-1"
   region2 = "us-east-1"
 
+  #TGW ROUTING INFOMRATION
+  tgw_routing_information = [ 
+    {
+        rt_name = ""
+        attachment_id = module.tgw.ec2_transit_gateway_vpc_attachment.tgw_att_to_hub.id
+        transit_gateway_hub_id = module.tgw.ec2_transit_gateway_id
+        tgw_custome_routes = [
+          {
+            destination_cidr_block = "10.1.160.0/21"
+            blackhole              = false
+            destination_attachment = module.tgw.ec2_transit_gateway_vpc_attachment.tgw_att_to_pod.id
+          }
+        ]
+        tgw_propagated_routes = {origin_attachments = []}
+    },
+    {
+        rt_name = ""
+        attachment_id = module.tgw.ec2_transit_gateway_vpc_attachment.tgw_att_to_pod.id
+        transit_gateway_hub_id = module.tgw.ec2_transit_gateway_id
+        tgw_custome_routes = [
+          {
+            destination_cidr_block = "0.0.0.0/0"
+            blackhole              = false
+            destination_attachment = module.tgw.ec2_transit_gateway_vpc_attachment.tgw_att_to_hub.id
+          },
+          {
+            destination_cidr_block = "10.1.128.0/20"
+            blackhole              = false
+            destination_attachment = module.tgw.ec2_transit_gateway_vpc_attachment.tgw_att_to_hub.id
+          }
+        ]
+        tgw_propagated_routes = {origin_attachments = [module.tgw.ec2_transit_gateway_vpc_attachment.tgw_att_to_hub.id]}
+    }
+  ]
+ 
+  #TGW VPN INFORMATION
   tgw_vpn_data = {
 
     transit_gateway_hub_id = module.tgw.ec2_transit_gateway_id
